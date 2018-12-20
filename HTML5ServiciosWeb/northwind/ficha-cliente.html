@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="../Content/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Ficha de Clientes</h1>
+                <hr />
+                <div class="form-group">
+                    <label>Identificador del cliente</label>
+                    <input type="text" class="form-control" id="id" autofocus />
+                </div>
+                <button id="b1" type="button" class="btn btn-success">Buscar</button>
+
+                <br />
+                <br />
+            </div>
+            <br />
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="r1">
+                    <h3><b>CustomerID: </b><span id="CustomerID"></span></h3>
+                    <h3><b>CompanyName: </b><span id="CompanyName"></span></h3>
+                    <h3><b>ContactName: </b><span id="ContactName"></span></h3>
+                    <h3><b>ContactTitle: </b><span id="ContactTitle"></span></h3>
+                    <h3><b>Address: </b><span id="Address"></span></h3>
+                    <h3><b>City: </b><span id="City"></span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col md-12">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <td>ID Pedido</td>
+                            <td>Empresa</td>
+                            <td>Ciudad</td>
+                            <td>Pais</td>
+                            <td>Fecha Pedido</td>
+                            <td>Importe</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="../Scripts/jquery-1.9.1.js"></script>
+    <script>
+        var b1 = document.getElementById('b1');
+        function BuscarCliente() {
+            var id = document.getElementById('id').value;
+            var r1 = document.getElementById('r1');
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/northwind/customers.ashx?id=' + id);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            for (var i in response) {
+                                var item = document.getElementById(i);
+                                if (item != null) {
+                                    item.innerHTML = response[i];
+                                }
+                            }
+
+                            /*r1.innerHTML = response.ContactName;
+                            r1.innerHTML += '<br />';
+                            r1.innerHTML += response.CompanyName;
+                            r1.innerHTML += '<br />';
+                            r1.innerHTML += response.Phone;
+                            r1.innerHTML += '<br />';
+                            r1.innerHTML += response.City;
+                            r1.innerHTML += '<br />';
+                            r1.innerHTML += response.Address;*/
+                        } catch (e) {
+                            alert(xhr.responseText);
+                        }
+
+                    }
+                }
+            }
+            xhr.send();
+        }
+        function BuscarPedidos() {
+            var id = $('#id').val();
+            $.ajax({
+                url: '../api/northwind/orders.ashx',
+                data: { id: id },
+                type: 'GET',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response) {
+                    $('tbody').html('');
+                    for (var pedido in response) {
+                        $('tbody').append(
+                            $('<tr>')
+                                .append($('<td>').html(response[pedido].OrderID))
+                                .append($('<td>').html(response[pedido].EMPRESA))
+                                .append($('<td>').html(response[pedido].ShipCity))
+                                .append($('<td>').html(response[pedido].ShipCountry))
+                                .append($('<td>').html(response[pedido].ShippedDate))
+                                .append($('<td>').html(response[pedido].IMPORTE))
+                        )
+
+                       /* var linea = $('<tr>').html('');
+                        $('#tabla').append(linea);
+
+                        var OrderID = $('<td>').html(response[pedido].OrderID);
+                        var EMPRESA = $('<td>').html(response[pedido].EMPRESA);
+                        var ShipCity = $('<td>').html(response[pedido].ShipCity);
+                        var ShipCountry = $('<td>').html(response[pedido].ShipCountry);
+                        var ShippedDate = $('<td>').html(response[pedido].ShippedDate);
+                        var IMPORTE = $('<td>').html(response[pedido].IMPORTE);
+
+                        OrderID.appendTo(linea);
+                        EMPRESA.appendTo(linea);
+                        ShipCity.appendTo(linea);
+                        ShipCountry.appendTo(linea);
+                        ShippedDate.appendTo(linea);
+                        IMPORTE.appendTo(linea);*/
+
+                        /*
+                         * pedido.OrderID
+                         * Empresa
+                         * pedido.ShipCity
+                         * pedido.ShipCountry
+                         * pedido.ShippedDate
+                         * importe
+                        */
+                    }
+                    //$('#aaa').html(datos);
+                }
+            });
+
+        }
+
+        b1.addEventListener('click', function () {
+            BuscarCliente();
+            BuscarPedidos();
+        });
+
+
+    </script>
+</body>
+</html>

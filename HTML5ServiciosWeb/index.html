@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <h1>Codigos Postales</h1>
+                <hr />
+                <input type="text" name="cp" id="cp" class="form-control" value="" placeholder="Escribe un Codigo Postal" />
+                <br />
+                <button id="b1" class="btn btn-success">Consultar</button>
+                <button id="b2" class="btn btn-success">JQuery</button>
+                <button id="b3" class="btn btn-success">Parada</button>
+                <button id="b4" class="btn btn-success">Divisas</button>
+
+                <br />
+                <br />
+                <div id="resultado"></div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+    <script src="Scripts/jquery-1.9.1.js"></script>
+    <script>
+        document.getElementById('b1').onclick = function () {
+            
+            //1. Instanciamos el objeto XMLHttpRequest
+            var peticion = new XMLHttpRequest;
+            //2. Configuramos el objeto
+            peticion.open('GET', 'http://api.zippopotam.us/ES/' + document.getElementById('cp').value);
+            peticion.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            //3. Capturamos el evento onreadystatechange
+            peticion.onreadystatechange = function () {
+                if (peticion.readyState == 4) {
+                    if (peticion.status == 200) {
+                        //document.getElementById('resultado').innerHTML = (peticion.responseText);
+                        document.getElementById('resultado').innerHTML += '<br />';
+                        var result = JSON.parse(peticion.responseText);
+                        document.getElementById('resultado').innerHTML += '<h1><b>Ciudad:</b> '+ result.places[0]['place name']+'</h1>';
+                        document.getElementById('resultado').innerHTML += '<br />';
+
+                        document.getElementById('resultado').innerHTML += '<h1><b>Provincia: </b>' +result.places[0].state + '</h1>';
+                        document.getElementById('resultado').innerHTML += '<br />';
+
+                        document.getElementById('resultado').innerHTML += '<h1><b>Pais: </b>' +result.country + '</h1>';
+                        
+                    } else {
+                        alert('Error de conexión');
+                    }
+                }
+            }
+            //4. Iniciamos la conexion y esperamos la respuesta
+            peticion.send();
+            
+            
+        }
+        $('#b2').bind('click', function () {
+            /*$.get('http://api.zippopotam.us/ES/' + $('#cp').val(), function (data) {
+                $('#resultado').html($('<h1>').html('<b>Ciudad: </b>' + data.places[0]['place name'] +
+                    '<br />' +
+                    '<b>Provincia: </b>' + data.places[0].state +
+                    '<br />' +
+                    '<b>Pais: </b>' + data.country));
+            });*/
+            $.get('http://api.zippopotam.us/ES/' + $('#cp').val(), function (data) {
+                $('#resultado').html($('<h1>').html('<b>Ciudad: </b>' + data.places[0]['place name'] +
+                    '<br />' +
+                    '<b>Provincia: </b>' + data.places[0].state +
+                    '<br />' +
+                    '<b>Pais: </b>' + data.country));
+            }).fail(function (error) {
+                alert(error);
+            });
+            //http://programadores.network/webservices/findBus.aspx?parada
+            /*$.ajax({
+                url: 'http://api.zippopotam.us/ES/' + $('#cp').val(),
+                type: 'GET',
+                data: '',
+                success: function (data) {
+                    $('#resultado').html($('<h1>').html('<b>Ciudad: </b>' + data.places[0]['place name'] +
+                        '<br />' +
+                        '<b>Provincia: </b>' + data.places[0].state +
+                        '<br />' +
+                        '<b>Pais: </b>' + data.country));
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                }
+
+            });*/
+        });
+        $('#b3').bind('click', function () {
+            $.ajax({
+                url: 'http://programadores.network/webservices/findBus.aspx?parada=' + $('#cp').val(),
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (datos) {
+                    var data = JSON.parse(datos);
+                    $('#resultado').html('');
+                    for (var i in data) {
+                        var i1 = data[i].idLine;
+                        var i2 = data[i].tiempoenmin;
+                        $('#resultado').append(i1 + ' ' + i2+'<br />');
+                    }
+                    
+                    //$('#resultado').html(data);
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                }
+
+            });
+        });
+        $('#b4').bind('click', function () {
+            $.ajax({
+                url: 'http://data.fixer.io/api/latest?access_key=3533a9a856ce25b93f2598a20d848ee2',
+                type: 'GET',
+                success: function (datos) {
+                    for (var i in datos.rates) {
+                        //console.log(i);     
+                        //console.log(datos.rates[i]);
+                        $('#resultado').append('<p>'+i+': '+ datos.rates[i]+'</p>');
+                    }
+                    //$('#resultado').html(data);
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                }
+
+            });
+        });
+    </script>
+</body>
+</html>
